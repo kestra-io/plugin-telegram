@@ -31,7 +31,7 @@ class TelegramExecutionTest extends AbstractTelegramTest {
 
     @BeforeEach
     protected void init() throws IOException, URISyntaxException {
-        repositoryLoader.load(Objects.requireNonNull(TelegramExecutionTest.class.getClassLoader().getResource("flowstempla")));
+        repositoryLoader.load(Objects.requireNonNull(TelegramExecutionTest.class.getClassLoader().getResource("flows")));
         this.runner.run();
     }
 
