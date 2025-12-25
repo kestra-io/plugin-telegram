@@ -2,6 +2,8 @@ package io.kestra.plugin.telegram;
 
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.client.HttpClient;
+import io.kestra.core.models.annotations.Example;
+import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.VoidOutput;
 import io.kestra.core.runners.RunContext;
@@ -19,6 +21,39 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 @Getter
 @NoArgsConstructor
+@Schema(
+    title = "Send a Telegram message."
+)
+@Plugin(
+    examples = {
+        @Example(
+            title = "Send a Telegram message on a failed flow execution.",
+            full = true,
+            code = """
+                id: unreliable_flow
+                namespace: company.team
+
+                tasks:
+                  - id: fail
+                    type: io.kestra.plugin.scripts.shell.Commands
+                    runner: PROCESS
+                    commands:
+                      - exit 1
+
+                errors:
+                  - id: alert_on_failure
+                    type: io.kestra.plugin.telegram.TelegramSend
+                    token: "{{ secret('TELEGRAM_TOKEN') }}" # format: 6090305634:xyz
+                    channel: "2072728690"
+                    payload: |
+                      {
+                        "text": "Telegram Alert"
+                      }
+                """
+        )
+    },
+    aliases = "io.kestra.plugin.notifications.telegram.TelegramSend"
+)
 public class TelegramSend extends AbstractTelegramConnection {
     private static final String TELEGRAMAPI_BASE_URL = "https://api.telegram.org";
 
@@ -43,16 +78,16 @@ public class TelegramSend extends AbstractTelegramConnection {
 
     @Override
     public VoidOutput run(RunContext runContext) throws Exception {
-        String url = runContext.render(this.endpointOverride).as(String.class).orElse(TELEGRAMAPI_BASE_URL);
+        String rEndpointOverride = runContext.render(this.endpointOverride).as(String.class).orElse(TELEGRAMAPI_BASE_URL);
 
         HttpRequest.HttpRequestBuilder requestBuilder = createRequestBuilder(runContext);
 
         try (HttpClient httpClient = new HttpClient(runContext, super.httpClientConfigurationWithOptions())) {
-            String destination = runContext.render(this.channel).as(String.class).orElseThrow();
-            String apiToken = runContext.render(this.token).as(String.class).orElseThrow();
-            String rendered = runContext.render(payload).as(String.class).orElseThrow();
-            String parseMode = runContext.render(this.parseMode).as(ParseMode.class).map(ParseMode::getValue).orElse(null);
-            TelegramBotApiService.send(httpClient, destination, apiToken, rendered, url, requestBuilder, parseMode);
+            String rDestination = runContext.render(this.channel).as(String.class).orElseThrow();
+            String rApiToken = runContext.render(this.token).as(String.class).orElseThrow();
+            String rPayload = runContext.render(payload).as(String.class).orElseThrow();
+            String rParseMode = runContext.render(this.parseMode).as(ParseMode.class).map(ParseMode::getValue).orElse(null);
+            TelegramBotApiService.send(httpClient, rDestination, rApiToken, rPayload, rEndpointOverride, requestBuilder, rParseMode);
         }
 
         return null;

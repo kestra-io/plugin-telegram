@@ -52,7 +52,8 @@ import java.util.Map;
                         prefix: true
                 """
         )
-    }
+    },
+    aliases = "io.kestra.plugin.notifications.telegram.TelegramExecution"
 )
 public class TelegramExecution extends TelegramTemplate implements ExecutionInterface {
 

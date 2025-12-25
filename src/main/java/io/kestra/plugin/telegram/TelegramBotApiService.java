@@ -23,7 +23,7 @@ public class TelegramBotApiService {
 
         TelegramMessage payload = new TelegramMessage(destinationId, message, parseMode);
 
-        String uri = url+ "/bot{token}/sendMessage".replace("{token}", apiToken);
+        String uri = url + "/bot{token}/sendMessage".replace("{token}", apiToken);
 
         requestBuilder
             .addHeader("Content-Type", "application/json")
