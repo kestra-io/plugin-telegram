@@ -24,13 +24,15 @@ import java.util.Objects;
 public abstract class TelegramTemplate extends TelegramSend {
 
     @Schema(
-            title = "Template to use",
+            title = "Template resource path",
+            description = "Classpath Pebble template used to build the message payload before sending.",
             hidden = true
     )
     protected Property<String> templateUri;
 
     @Schema(
-            title = "Map of variables to use for the message template (Unused in the default template)"
+            title = "Template variables",
+            description = "Map of variables rendered and passed to the Pebble template; defaults to an empty map when not provided."
     )
     protected Property<Map<String, Object>> templateRenderMap;
 
