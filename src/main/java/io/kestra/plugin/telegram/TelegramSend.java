@@ -22,7 +22,8 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send a Telegram message."
+    title = "Send a Telegram chat message",
+    description = "Posts a Telegram `sendMessage` request using a Bot token and chat ID. Payload must be valid Telegram JSON; default parse mode sends plain text. Supports HTTP client overrides and an optional API endpoint override for local testing."
 )
 @Plugin(
     examples = {
@@ -57,22 +58,23 @@ import lombok.experimental.SuperBuilder;
 public class TelegramSend extends AbstractTelegramConnection {
     private static final String TELEGRAMAPI_BASE_URL = "https://api.telegram.org";
 
-    @Schema(title = "Telegram Bot token")
+    @Schema(title = "Bot access token", description = "Telegram Bot API token; store as a secret and avoid hardcoding.")
     @NotNull
     protected Property<String> token;
 
-    @Schema(title = "Telegram channel/user ID")
+    @Schema(title = "Chat ID or channel ID", description = "Target chat identifier for the user or channel; supports expressions.")
     @NotNull
     protected Property<String> channel;
 
-    @Schema(title = "Message payload")
+    @Schema(title = "Message payload", description = "Rendered JSON body passed to Telegram `sendMessage` (must include `text`).")
     protected Property<String> payload;
 
-    @Schema(title = "Telegram Bot parse-Mode", description = "Optional text formatting mode for Telegram messages. Supported values: HTML, Markdown, MarkdownV2.", example = "HTML")
+    @Schema(title = "Telegram Bot parse-Mode", description = "Optional text formatting mode (HTML or MarkdownV2); default sends plain text.", example = "HTML")
     @Nullable
     protected Property<ParseMode> parseMode;
     @Schema(
-        title = "Only to be used when testing locally"
+        title = "Custom Telegram API base URL",
+        description = "Override the Telegram API endpoint for local testing; defaults to https://api.telegram.org."
     )
     protected Property<String> endpointOverride;
 

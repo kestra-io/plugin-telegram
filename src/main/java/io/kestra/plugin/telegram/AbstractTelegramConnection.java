@@ -27,8 +27,8 @@ import java.util.Map;
 @NoArgsConstructor
 public abstract class AbstractTelegramConnection extends Task implements RunnableTask<VoidOutput> {
     @Schema(
-        title = "Options",
-        description = "The options to set to customize the HTTP client"
+        title = "Configure Telegram HTTP client",
+        description = "Optional HTTP client overrides for Telegram calls. Leave unset to use defaults: 10s read timeout, 5m read idle timeout, 10 MB max response, UTF-8 charset."
     )
     @PluginProperty(dynamic = true)
     protected RequestOptions options;
@@ -68,26 +68,26 @@ public abstract class AbstractTelegramConnection extends Task implements Runnabl
     @Getter
     @Builder
     public static class RequestOptions {
-        @Schema(title = "The time allowed to establish a connection to the server before failing.")
+        @Schema(title = "Maximum time to establish the connection before failing; unset uses the client default.")
         private final Property<Duration> connectTimeout;
 
-        @Schema(title = "The maximum time allowed for reading data from the server before failing.")
+        @Schema(title = "Maximum read duration before failing; defaults to 10s.")
         @Builder.Default
         private final Property<Duration> readTimeout = Property.ofValue(Duration.ofSeconds(10));
 
-        @Schema(title = "The time allowed for a read connection to remain idle before closing it.")
+        @Schema(title = "Idle time allowed while reading before closing the connection; defaults to 5m.")
         @Builder.Default
         private final Property<Duration> readIdleTimeout = Property.ofValue(Duration.of(5, ChronoUnit.MINUTES));
 
-        @Schema(title = "The time an idle connection can remain in the client's connection pool before being closed.")
+        @Schema(title = "Idle timeout for pooled connections; defaults to 0s.")
         @Builder.Default
         private final Property<Duration> connectionPoolIdleTimeout = Property.ofValue(Duration.ofSeconds(0));
 
-        @Schema(title = "The maximum content length of the response.")
+        @Schema(title = "Maximum response size; defaults to 10 MB.")
         @Builder.Default
         private final Property<Integer> maxContentLength = Property.ofValue(1024 * 1024 * 10);
 
-        @Schema(title = "The default charset for the request.")
+        @Schema(title = "Request charset; defaults to UTF-8.")
         @Builder.Default
         private final Property<Charset> defaultCharset = Property.ofValue(StandardCharsets.UTF_8);
 

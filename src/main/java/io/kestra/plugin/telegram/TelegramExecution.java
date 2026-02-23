@@ -19,9 +19,8 @@ import java.util.Map;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send a Telegram message with the execution information.",
-    description = "The message will include a link to the execution page in the UI along with the execution ID, namespace, flow name, the start date, duration, and the final status of the execution. If failed, then the task that led to the failure is specified.\n\n" +
-    "Use this notification task only in a flow that has a [Flow trigger](https://kestra.io/docs/administrator-guide/monitoring#alerting). Don't use this notification task in `errors` tasks. Instead, for `errors` tasks, use the [TelegramSend](https://kestra.io/plugins/plugin-telegram/io.kestra.plugin.telegram.telegramsend) task."
+    title = "Notify Telegram about execution result",
+    description = "Sends a templated Telegram message with execution link, identifiers, timing, status, and failing task when applicable. Use with a [Flow trigger](https://kestra.io/docs/administrator-guide/monitoring#alerting); for `errors` handlers prefer [TelegramSend](https://kestra.io/plugins/plugin-telegram/io.kestra.plugin.telegram.telegramsend)."
 )
 @Plugin(
     examples = {
