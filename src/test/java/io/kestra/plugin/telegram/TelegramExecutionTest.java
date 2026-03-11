@@ -1,18 +1,20 @@
 package io.kestra.plugin.telegram;
 
-import io.kestra.core.junit.annotations.KestraTest;
-import io.kestra.core.repositories.LocalFlowRepositoryLoader;
-import io.kestra.core.runners.TestRunner;
-import io.kestra.core.utils.Await;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import io.kestra.core.junit.annotations.KestraTest;
+import io.kestra.core.repositories.LocalFlowRepositoryLoader;
+import io.kestra.core.runners.TestRunner;
+import io.kestra.core.utils.Await;
+
+import jakarta.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
@@ -43,7 +45,7 @@ class TelegramExecutionTest extends AbstractTelegramTest {
         );
 
         try {
-           Await.until(
+            Await.until(
                 () -> FakeTelegramController.message,
                 Duration.ofMillis(100),
                 Duration.ofSeconds(5)
@@ -59,4 +61,3 @@ class TelegramExecutionTest extends AbstractTelegramTest {
         assertThat(FakeTelegramController.message.getText(), containsString("Final task ID ➛ failed"));
     }
 }
-

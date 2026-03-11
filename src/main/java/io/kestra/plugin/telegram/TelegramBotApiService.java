@@ -1,7 +1,11 @@
 package io.kestra.plugin.telegram;
 
+import java.net.URI;
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -14,12 +18,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.net.URI;
-import java.util.Objects;
-
 public class TelegramBotApiService {
 
-    public static void send(HttpClient client, String destinationId, String apiToken, String message, String url, HttpRequest.HttpRequestBuilder requestBuilder, String parseMode) throws ErrorSendingMessageException {
+    public static void send(HttpClient client, String destinationId, String apiToken, String message, String url, HttpRequest.HttpRequestBuilder requestBuilder, String parseMode)
+        throws ErrorSendingMessageException {
 
         TelegramMessage payload = new TelegramMessage(destinationId, message, parseMode);
 
@@ -29,18 +31,22 @@ public class TelegramBotApiService {
             .addHeader("Content-Type", "application/json")
             .uri(URI.create(uri))
             .method("POST")
-            .body(HttpRequest.JsonRequestBody.builder()
-                .content(payload)
-                .build());
+            .body(
+                HttpRequest.JsonRequestBody.builder()
+                    .content(payload)
+                    .build()
+            );
 
         HttpRequest request = requestBuilder.build();
 
         try {
             HttpResponse<TelegramBotApiResponse> exchange = client.request(request, TelegramBotApiResponse.class);
 
-            if (exchange.getStatus().getCode() != HttpStatus.OK.getCode()
+            if (
+                exchange.getStatus().getCode() != HttpStatus.OK.getCode()
                     || exchange.getBody() == null
-                    || !Objects.requireNonNull(exchange.getBody()).ok()) {
+                    || !Objects.requireNonNull(exchange.getBody()).ok()
+            ) {
                 throw new ErrorSendingMessageException(exchange.getStatus(), null);
             }
         } catch (HttpClientResponseException e) {

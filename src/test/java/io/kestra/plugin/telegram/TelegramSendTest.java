@@ -1,13 +1,15 @@
 package io.kestra.plugin.telegram;
 
+import org.junit.jupiter.api.Test;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
+
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.server.EmbeddedServer;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -38,11 +40,11 @@ class TelegramSendTest {
         String token = "token";
 
         TelegramSend task = TelegramSend.builder()
-                .endpointOverride(Property.ofValue(embeddedServer.getURL().toString()))
-                .token(Property.ofValue(token))
-                .channel(Property.ofValue(channel))
-                .payload(Property.ofValue(message))
-                .build();
+            .endpointOverride(Property.ofValue(embeddedServer.getURL().toString()))
+            .token(Property.ofValue(token))
+            .channel(Property.ofValue(channel))
+            .payload(Property.ofValue(message))
+            .build();
         task.run(runContext);
 
         assertThat(FakeTelegramController.token, containsString(token));
