@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -29,12 +30,14 @@ public abstract class TelegramTemplate extends TelegramSend {
         description = "Classpath Pebble template used to build the message payload before sending.",
         hidden = true
     )
+    @PluginProperty(group = "advanced")
     protected Property<String> templateUri;
 
     @Schema(
         title = "Template variables",
         description = "Map of variables rendered and passed to the Pebble template; defaults to an empty map when not provided."
     )
+    @PluginProperty(group = "advanced")
     protected Property<Map<String, Object>> templateRenderMap;
 
     @SuppressWarnings("unchecked")

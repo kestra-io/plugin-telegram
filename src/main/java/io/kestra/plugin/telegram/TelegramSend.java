@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -61,22 +62,27 @@ public class TelegramSend extends AbstractTelegramConnection {
 
     @Schema(title = "Bot access token", description = "Telegram Bot API token; store as a secret and avoid hardcoding.")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> token;
 
     @Schema(title = "Chat ID or channel ID", description = "Target chat identifier for the user or channel; supports expressions.")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> channel;
 
     @Schema(title = "Message payload", description = "Rendered JSON body passed to Telegram `sendMessage` (must include `text`).")
+    @PluginProperty(group = "main")
     protected Property<String> payload;
 
     @Schema(title = "Telegram Bot parse-Mode", description = "Optional text formatting mode (HTML or MarkdownV2); default sends plain text.", example = "HTML")
     @Nullable
+    @PluginProperty(group = "advanced")
     protected Property<ParseMode> parseMode;
     @Schema(
         title = "Custom Telegram API base URL",
         description = "Override the Telegram API endpoint for local testing; defaults to https://api.telegram.org."
     )
+    @PluginProperty(group = "connection")
     protected Property<String> endpointOverride;
 
     @Override
