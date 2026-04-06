@@ -31,7 +31,7 @@ public abstract class AbstractTelegramConnection extends Task implements Runnabl
         title = "Configure Telegram HTTP client",
         description = "Optional HTTP client overrides for Telegram calls. Leave unset to use defaults: 10s read timeout, 5m read idle timeout, 10 MB max response, UTF-8 charset."
     )
-    @PluginProperty(dynamic = true)
+    @PluginProperty(dynamic = true, group = "advanced")
     protected RequestOptions options;
 
     protected HttpConfiguration httpClientConfigurationWithOptions() throws IllegalVariableEvaluationException {
@@ -72,32 +72,39 @@ public abstract class AbstractTelegramConnection extends Task implements Runnabl
     @Builder
     public static class RequestOptions {
         @Schema(title = "Maximum time to establish the connection before failing; unset uses the client default.")
+        @PluginProperty(group = "execution")
         private final Property<Duration> connectTimeout;
 
         @Schema(title = "Maximum read duration before failing; defaults to 10s.")
         @Builder.Default
+        @PluginProperty(group = "execution")
         private final Property<Duration> readTimeout = Property.ofValue(Duration.ofSeconds(10));
 
         @Schema(title = "Idle time allowed while reading before closing the connection; defaults to 5m.")
         @Builder.Default
+        @PluginProperty(group = "execution")
         private final Property<Duration> readIdleTimeout = Property.ofValue(Duration.of(5, ChronoUnit.MINUTES));
 
         @Schema(title = "Idle timeout for pooled connections; defaults to 0s.")
         @Builder.Default
+        @PluginProperty(group = "execution")
         private final Property<Duration> connectionPoolIdleTimeout = Property.ofValue(Duration.ofSeconds(0));
 
         @Schema(title = "Maximum response size; defaults to 10 MB.")
         @Builder.Default
+        @PluginProperty(group = "execution")
         private final Property<Integer> maxContentLength = Property.ofValue(1024 * 1024 * 10);
 
         @Schema(title = "Request charset; defaults to UTF-8.")
         @Builder.Default
+        @PluginProperty(group = "advanced")
         private final Property<Charset> defaultCharset = Property.ofValue(StandardCharsets.UTF_8);
 
         @Schema(
             title = "HTTP headers",
             description = "HTTP headers to include in the request"
         )
+        @PluginProperty(group = "advanced")
         public Property<Map<String, String>> headers;
     }
 }
