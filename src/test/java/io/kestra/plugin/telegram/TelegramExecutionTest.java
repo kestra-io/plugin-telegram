@@ -6,8 +6,9 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.repositories.LocalFlowRepositoryLoader;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.containsString;
  * This test will only test the main task, this allow you to send any input
  * parameters to your task and test the returning behaviour easily.
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @KestraTest
 class TelegramExecutionTest extends AbstractTelegramTest {
     @Inject
@@ -31,7 +33,7 @@ class TelegramExecutionTest extends AbstractTelegramTest {
     @Inject
     protected LocalFlowRepositoryLoader repositoryLoader;;
 
-    @BeforeEach
+    @BeforeAll
     protected void init() throws IOException, URISyntaxException {
         repositoryLoader.load(Objects.requireNonNull(TelegramExecutionTest.class.getClassLoader().getResource("flows")));
         this.runner.run();
@@ -46,7 +48,9 @@ class TelegramExecutionTest extends AbstractTelegramTest {
 
         try {
             Await.until(
-                () -> FakeTelegramController.message,
+                () -> FakeTelegramController.message != null && FakeTelegramController.message.getText() != null && FakeTelegramController.message.getText().contains(failedExecution.getId())
+                    ? FakeTelegramController.message
+                    : null,
                 Duration.ofMillis(100),
                 Duration.ofSeconds(5)
             );
