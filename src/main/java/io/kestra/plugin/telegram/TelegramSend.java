@@ -62,7 +62,7 @@ public class TelegramSend extends AbstractTelegramConnection {
 
     @Schema(title = "Bot access token", description = "Telegram Bot API token; store as a secret and avoid hardcoding.")
     @NotNull
-    @PluginProperty(group = "main")
+    @PluginProperty(secret = true, group = "main")
     protected Property<String> token;
 
     @Schema(title = "Chat ID or channel ID", description = "Target chat identifier for the user or channel; supports expressions.")
