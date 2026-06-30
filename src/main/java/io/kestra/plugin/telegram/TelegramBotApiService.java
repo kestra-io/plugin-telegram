@@ -25,7 +25,11 @@ public class TelegramBotApiService {
 
         TelegramMessage payload = new TelegramMessage(destinationId, message, parseMode);
 
-        String uri = url + "/bot{token}/sendMessage".replace("{token}", apiToken);
+        // The Telegram Bot API requires the token in the URL path (/bot<token>/sendMessage).
+        // This is mandated by the API design and cannot be replaced with an Authorization header.
+        // CWE-598: To reduce log-based exposure, the token is inserted only into the outbound
+        // URI and never referenced in log statements. Treat any HTTP-client DEBUG logs as sensitive.
+        String uri = url + "/bot" + apiToken + "/sendMessage";
 
         requestBuilder
             .addHeader("Content-Type", "application/json")
