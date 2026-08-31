@@ -25,7 +25,7 @@ import io.kestra.core.models.annotations.PluginProperty;
 @NoArgsConstructor
 @Schema(
     title = "Send a Telegram chat message",
-    description = "Posts a Telegram `sendMessage` request using a Bot token and chat ID. Payload must be valid Telegram JSON; default parse mode sends plain text. Supports HTTP client overrides and an optional API endpoint override for local testing."
+    description = "Posts a Telegram `sendMessage` request using a Bot token and chat ID. Set `payload` directly to the message text. Use `parseMode` for HTML or MarkdownV2 formatting. Supports HTTP client overrides and an optional API endpoint override for local testing."
 )
 @Plugin(
     examples = {
@@ -48,10 +48,10 @@ import io.kestra.core.models.annotations.PluginProperty;
                     type: io.kestra.plugin.telegram.TelegramSend
                     token: "{{ secret('TELEGRAM_TOKEN') }}" # format: 6090305634:xyz
                     channel: "2072728690"
+                    parseMode: HTML
                     payload: |
-                      {
-                        "text": "Telegram Alert"
-                      }
+                      <b>Telegram Alert</b>
+                      The flow failed and needs your attention.
                 """
         )
     },
@@ -71,7 +71,7 @@ public class TelegramSend extends AbstractTelegramConnection {
     @PluginProperty(group = "main")
     protected Property<String> channel;
 
-    @Schema(title = "Message payload", description = "Rendered JSON body passed to Telegram `sendMessage` (must include `text`).")
+    @Schema(title = "Message payload", description = "Message text sent to Telegram. Use plain text by default, or HTML or MarkdownV2 content with the matching `parseMode`.")
     @PluginProperty(group = "main")
     protected Property<String> payload;
 
