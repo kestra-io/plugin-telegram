@@ -4,6 +4,7 @@ import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.VoidOutput;
 import io.kestra.core.runners.RunContext;
@@ -16,7 +17,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -75,7 +75,11 @@ public class TelegramSend extends AbstractTelegramConnection {
     @PluginProperty(group = "main")
     protected Property<String> payload;
 
-    @Schema(title = "Telegram Bot parse-Mode", description = "Optional text formatting mode (HTML or MarkdownV2); default sends plain text.", example = "HTML")
+    @Schema(
+        title = "Telegram Bot parse-Mode",
+        description = "Optional text formatting mode. Use the case-sensitive enum names HTML or MARKDOWNV2 (values sent to Telegram are HTML and MarkdownV2). Default sends plain text.",
+        example = "MARKDOWNV2"
+    )
     @Nullable
     @PluginProperty(group = "advanced")
     protected Property<ParseMode> parseMode;
@@ -115,6 +119,22 @@ public class TelegramSend extends AbstractTelegramConnection {
 
         public String getValue() {
             return value;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonCreator
+        public static ParseMode fromString(String value) {
+            if (value == null) {
+                return null;
+            }
+            for (ParseMode parseMode : ParseMode.values()) {
+                if (parseMode.name().equals(value)) {
+                    return parseMode;
+                }
+            }
+            throw new IllegalArgumentException(
+                "Invalid parseMode value '" + value + "'. Valid values (case-sensitive): " +
+                    java.util.Arrays.stream(ParseMode.values()).map(Enum::name).collect(java.util.stream.Collectors.joining(", "))
+            );
         }
     }
 }

@@ -1,11 +1,14 @@
 package io.kestra.plugin.telegram;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.runners.RunContextFactory;
+import io.kestra.core.serializers.JacksonMapper;
 
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.server.EmbeddedServer;
@@ -27,6 +30,13 @@ class TelegramSendTest {
 
     @Inject
     private RunContextFactory runContextFactory;
+
+    @BeforeEach
+    @AfterEach
+    void resetMock() {
+        FakeTelegramController.message = null;
+        FakeTelegramController.token = null;
+    }
 
     @Test
     void run() throws Exception {
@@ -79,7 +89,7 @@ class TelegramSendTest {
     }
 
     @Test
-    void run_withParseModeAsMarktDownV2_shouldSendTelegram() throws Exception {
+    void run_withParseModeAsMARKDOWNV2_shouldSendTelegram() throws Exception {
         RunContext runContext = runContextFactory.of();
 
         EmbeddedServer embeddedServer = applicationContext.getBean(EmbeddedServer.class);
@@ -102,5 +112,60 @@ class TelegramSendTest {
         assertThat(FakeTelegramController.token, containsString(token));
         assertThat(FakeTelegramController.message, equalToObject(new TelegramBotApiService.TelegramMessage(channel, message, parseMode)));
 
+    }
+
+    @Test
+    void parseMode_fromString_validValues() {
+        assertThat(TelegramSend.ParseMode.fromString("HTML"), equalToObject(TelegramSend.ParseMode.HTML));
+        assertThat(TelegramSend.ParseMode.fromString("MARKDOWNV2"), equalToObject(TelegramSend.ParseMode.MARKDOWNV2));
+        assertThat(TelegramSend.ParseMode.fromString(null), equalToObject(null));
+    }
+
+    @Test
+    void parseMode_fromString_invalidMixedCase_shouldThrowDescriptiveException() {
+        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> TelegramSend.ParseMode.fromString("MarkdownV2")
+        );
+
+        assertThat(
+            exception.getMessage(),
+            equalToObject("Invalid parseMode value 'MarkdownV2'. Valid values (case-sensitive): HTML, MARKDOWNV2")
+        );
+    }
+
+    @Test
+    void parseMode_fromString_invalidValue_shouldThrowDescriptiveException() {
+        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> TelegramSend.ParseMode.fromString("INVALID")
+        );
+
+        assertThat(
+            exception.getMessage(),
+            equalToObject("Invalid parseMode value 'INVALID'. Valid values (case-sensitive): HTML, MARKDOWNV2")
+        );
+    }
+
+    @Test
+    void deserialize_parseMode_withInvalidMixedCase_shouldThrowDescriptiveException() {
+        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(
+            Exception.class,
+            () -> JacksonMapper.ofYaml().readValue("\"MarkdownV2\"", TelegramSend.ParseMode.class)
+        );
+
+        assertThat(
+            exception.getMessage(),
+            containsString("Invalid parseMode value 'MarkdownV2'. Valid values (case-sensitive): HTML, MARKDOWNV2")
+        );
+    }
+
+    @Test
+    void deserialize_parseMode_withValidValues() throws Exception {
+        TelegramSend.ParseMode html = JacksonMapper.ofYaml().readValue("\"HTML\"", TelegramSend.ParseMode.class);
+        TelegramSend.ParseMode markdown = JacksonMapper.ofYaml().readValue("\"MARKDOWNV2\"", TelegramSend.ParseMode.class);
+
+        assertThat(html, equalToObject(TelegramSend.ParseMode.HTML));
+        assertThat(markdown, equalToObject(TelegramSend.ParseMode.MARKDOWNV2));
     }
 }
