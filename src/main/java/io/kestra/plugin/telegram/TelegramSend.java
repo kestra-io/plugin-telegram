@@ -25,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Schema(
     title = "Send a Telegram chat message",
-    description = "Posts a Telegram `sendMessage` request using a Bot token and chat ID. Payload must be valid Telegram JSON; default parse mode sends plain text. Supports HTTP client overrides and an optional API endpoint override for local testing."
+    description = "Posts a Telegram `sendMessage` request using a Bot token and chat ID. The payload is the message text (plain text or HTML/MarkdownV2 markup); default parse mode sends plain text. Supports HTTP client overrides and an optional API endpoint override for local testing."
 )
 @Plugin(
     examples = {
@@ -48,10 +48,8 @@ import lombok.experimental.SuperBuilder;
                     type: io.kestra.plugin.telegram.TelegramSend
                     token: "{{ secret('TELEGRAM_TOKEN') }}" # format: 6090305634:xyz
                     channel: "2072728690"
-                    payload: |
-                      {
-                        "text": "Telegram Alert"
-                      }
+                    parseMode: HTML
+                    payload: "<b>Telegram Alert</b>"
                 """
         )
     },
@@ -71,15 +69,11 @@ public class TelegramSend extends AbstractTelegramConnection {
     @PluginProperty(group = "main")
     protected Property<String> channel;
 
-    @Schema(title = "Message payload", description = "Rendered JSON body passed to Telegram `sendMessage` (must include `text`).")
+    @Schema(title = "Message payload", description = "Message text sent as Telegram `sendMessage` `text` (plain text, or HTML/MarkdownV2 markup when parseMode is set). Do not wrap the value in a JSON object.")
     @PluginProperty(group = "main")
     protected Property<String> payload;
 
-    @Schema(
-        title = "Telegram Bot parse-Mode",
-        description = "Optional text formatting mode. Use the case-sensitive enum names HTML or MARKDOWNV2 (values sent to Telegram are HTML and MarkdownV2). Default sends plain text.",
-        example = "MARKDOWNV2"
-    )
+    @Schema(title = "Telegram Bot parse-Mode", description = "Optional text formatting mode. Use the case-sensitive enum names HTML or MARKDOWNV2 (values sent to Telegram are HTML and MarkdownV2). Default sends plain text.", example = "MARKDOWNV2")
     @Nullable
     @PluginProperty(group = "advanced")
     protected Property<ParseMode> parseMode;
