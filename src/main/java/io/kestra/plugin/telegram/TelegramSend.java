@@ -1,9 +1,16 @@
 package io.kestra.plugin.telegram;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.client.HttpClient;
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.VoidOutput;
 import io.kestra.core.runners.RunContext;
@@ -16,7 +23,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -69,11 +75,18 @@ public class TelegramSend extends AbstractTelegramConnection {
     @PluginProperty(group = "main")
     protected Property<String> channel;
 
-    @Schema(title = "Message payload", description = "Message text sent as Telegram `sendMessage` `text` (plain text, or HTML/MarkdownV2 markup when parseMode is set). Do not wrap the value in a JSON object.")
+    @Schema(
+        title = "Message payload",
+        description = "Message text sent as Telegram `sendMessage` `text` (plain text, or HTML/MarkdownV2 markup when parseMode is set). Do not wrap the value in a JSON object."
+    )
     @PluginProperty(group = "main")
     protected Property<String> payload;
 
-    @Schema(title = "Telegram Bot parse-Mode", description = "Optional text formatting mode. Use the case-sensitive enum names HTML or MARKDOWNV2 (values sent to Telegram are HTML and MarkdownV2). Default sends plain text.", example = "MARKDOWNV2")
+    @Schema(
+        title = "Telegram Bot parse-Mode",
+        description = "Optional text formatting mode. Use the case-sensitive enum names HTML or MARKDOWNV2 (values sent to Telegram are HTML and MarkdownV2). Default sends plain text.",
+        example = "MARKDOWNV2"
+    )
     @Nullable
     @PluginProperty(group = "advanced")
     protected Property<ParseMode> parseMode;
@@ -94,7 +107,12 @@ public class TelegramSend extends AbstractTelegramConnection {
             String rDestination = runContext.render(this.channel).as(String.class).orElseThrow();
             String rApiToken = runContext.render(this.token).as(String.class).orElseThrow();
             String rPayload = runContext.render(payload).as(String.class).orElseThrow();
-            String rParseMode = runContext.render(this.parseMode).as(ParseMode.class).map(ParseMode::getValue).orElse(null);
+            String rParseMode = this.parseMode != null
+                ? Optional.ofNullable(runContext.render(this.parseMode.toString()))
+                    .map(ParseMode::fromString)
+                    .map(ParseMode::getValue)
+                    .orElse(null)
+                : null;
             TelegramBotApiService.send(httpClient, rDestination, rApiToken, rPayload, rEndpointOverride, requestBuilder, rParseMode);
         }
 
@@ -113,6 +131,22 @@ public class TelegramSend extends AbstractTelegramConnection {
 
         public String getValue() {
             return value;
+        }
+
+        @JsonCreator
+        public static ParseMode fromString(String value) {
+            if (value == null) {
+                return null;
+            }
+            for (ParseMode parseMode : ParseMode.values()) {
+                if (parseMode.name().equals(value)) {
+                    return parseMode;
+                }
+            }
+            throw new IllegalArgumentException(
+                "Invalid parseMode value '" + value + "'. Valid values (case-sensitive): " +
+                    Arrays.stream(ParseMode.values()).map(Enum::name).collect(Collectors.joining(", "))
+            );
         }
     }
 }
