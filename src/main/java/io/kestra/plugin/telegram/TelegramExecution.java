@@ -61,6 +61,12 @@ public class TelegramExecution extends TelegramTemplate implements ExecutionInte
     @Builder.Default
     @PluginProperty(group = "advanced")
     private final Property<String> executionId = Property.ofExpression("{{ execution.id }}");
+    @Schema(
+        title = "Custom fields",
+        description = """
+            Added to the message as one `key: value` line each, after the `customMessage` if it is set. \
+            Telegram limits a message to 4096 characters, so a longer message is shortened and ends with `...`."""
+    )
     @PluginProperty(group = "destination")
     private Property<Map<String, Object>> customFields;
     @PluginProperty(group = "destination")

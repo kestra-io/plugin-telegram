@@ -1,1 +1,4 @@
-"<{{execution.namespace}} {{execution.flowId}} {{execution.id}} ➛ {{execution.state.current}} - Final task ID ➛ {{lastTask.taskId}}> {% if firstFailed == false %}Succeeded{% else %}Failed on task `{{firstFailed.taskId}}`{% endif %} after {{duration}} ({{link}})"
+"{% filter abbreviate(4094) %}<{{execution.namespace}} {{execution.flowId}} {{execution.id}} ➛ {{execution.state.current}} - Final task ID ➛ {{lastTask.taskId}}> {% if firstFailed == false %}Succeeded{% else %}Failed on task `{{firstFailed.taskId}}`{% endif %} after {{duration}} ({{link}}){% set hasMessage = customMessage is defined and customMessage is not empty %}{% set hasFields = customFields is defined and customFields is not empty %}{% if hasMessage or hasFields %}
+{% endif %}{% if hasMessage %}
+{{ customMessage }}{% endif %}{% if hasFields %}{% for entry in customFields %}
+{{ entry.key }}: {{ (entry.value is map or entry.value is iterable) ? (entry.value | toJson) : (entry.value | string | default("-")) }}{% endfor %}{% endif %}{% endfilter %}"

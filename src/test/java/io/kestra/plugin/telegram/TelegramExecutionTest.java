@@ -59,5 +59,6 @@ class TelegramExecutionTest extends AbstractTelegramTest {
         assertThat(FakeTelegramController.message.getText(), containsString("<io.kestra.tests main-flow-that-fails"));
         assertThat(FakeTelegramController.message.getText(), containsString("Failed on task `failed`"));
         assertThat(FakeTelegramController.message.getText(), containsString("Final task ID ➛ failed"));
+        assertThat(FakeTelegramController.message.getText(), containsString("\n\nDisk is \"almost\" full\nenv: prod\nretries: 3"));
     }
 }

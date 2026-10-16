@@ -13,6 +13,10 @@ tasks:
     channel: "channel"
     token: "token"
     executionId: "{{trigger.executionId}}"
+    customMessage: 'Disk is "almost" full'
+    customFields:
+      env: prod
+      retries: 3
 
 triggers:
   - id: on_failure
