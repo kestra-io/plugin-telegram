@@ -24,10 +24,11 @@ import lombok.experimental.SuperBuilder;
     title = "Notify Telegram about execution result",
     description = "Sends a templated Telegram message with execution link, identifiers, timing, status, and failing task when applicable. Use with a [Flow trigger](https://kestra.io/docs/administrator-guide/monitoring#alerting); for `errors` handlers prefer [TelegramSend](https://kestra.io/plugins/plugin-telegram/io.kestra.plugin.telegram.telegramsend)."
 )
+
 @Plugin(
     examples = {
         @Example(
-            title = "Send a Telegram notification on a failed flow execution.",
+            title = "Send a Telegram notification on a failed flow execution (Kestra 1.x)",
             full = true,
             code = """
                 id: failure_alert
@@ -52,10 +53,34 @@ import lombok.experimental.SuperBuilder;
                         namespace: prod
                         prefix: true
                 """
+        ),
+        @Example(
+            title = "Send a Telegram notification on a failed flow execution (Kestra 2.0+)",
+            full = true,
+            code = """
+                id: failure_alert
+                namespace: company.team
+
+                tasks:
+                  - id: send_alert
+                    type: io.kestra.plugin.telegram.TelegramExecution
+                    token: "{{ secret('TELEGRAM_TOKEN') }}" # format: 6090305634:xyz
+                    channel: "2072728690"
+                    executionId: "{{ trigger.executionId }}"
+
+                triggers:
+                  - id: failed_prod_workflows
+                    type: io.kestra.plugin.core.trigger.Flow
+                    states:
+                      - FAILED
+                      - WARNING
+                    when: "{{ flow.namespace | startsWith('prod') }}"
+                """
         )
     },
     aliases = "io.kestra.plugin.notifications.telegram.TelegramExecution"
 )
+
 public class TelegramExecution extends TelegramTemplate implements ExecutionInterface {
 
     @Builder.Default
